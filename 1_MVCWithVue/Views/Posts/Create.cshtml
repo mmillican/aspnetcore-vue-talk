@@ -1,0 +1,60 @@
+@model BlogPost
+
+@{
+    ViewBag.Title = "New Blog Post";
+}
+
+<h1>@ViewBag.Title</h1>
+
+<form asp-action="Create" method="post">
+    <div class="row">
+        <div class="col-md-5 form-group">            
+            <label asp-for="Title"></label>
+            <input type="text" asp-for="Title" class="form-control" />
+        </div>
+        <div class="col-md-4 form-group">            
+            <label asp-for="Slug"></label>
+            <input type="text" asp-for="Slug" class="form-control" />
+        </div>
+        <div class="col-md-3 form-group">            
+            <label asp-for="PostDate"></label>
+            <input type="date" asp-for="PostDate" class="form-control" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 form-group">
+            <label asp-for="Content"></label>
+            <textarea asp-for="Content" class="form-control" rows="10"></textarea>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Post</button>
+</form>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function(){
+            $('#Title').on('blur', function() {
+                console.log('Title >', $('#Title').val());
+
+                if (!$('#Slug').val()) {
+                    var data = JSON.stringify({
+                        title: $('#Title').val(),
+                    });
+
+                    $.ajax({
+                        url: '@Url.Action("SuggestSlug")',
+                        method: 'POST',
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        data: data,
+                        success: function(result) {
+                            $('#Slug').val(result.slug);
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,23 @@
+@model List<BlogPost>
+
+@{
+    ViewBag.Title = "Blog Posts";
+}
+
+<h1>@ViewBag.Title</h1>
+
+<p>
+    <a href="/admin/posts/new" class="btn btn-success">New Post</a>
+</p>
+
+<div class="blog-posts">
+    @foreach(var post in Model)
+    {
+        <div class="post mb-4">
+            <h3>
+                <a asp-action="ViewPost" asp-route-slug="@post.Slug">@post.Title</a>
+                <br /><small>@post.PostDate.ToString("d")</small>
+            </h3>
+        </div>
+    }
+</div>

@@ -1,0 +1,107 @@
+@model BlogPost
+
+@{
+    ViewBag.Title = Model.Title;
+}
+
+<h1>@ViewBag.Title</h1>
+
+<p>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Edit Post</a>
+</p>
+
+<div class="blog-post">
+    <h4>Posted @Model.PostDate.ToString("d")</h4>
+
+    <div class="content">
+        @Html.Raw(Model.Content)
+    </div>
+
+    <div v-cloak class="comments mt-4" id="comments">
+        <hr />
+        <h4>{{ comments.length }} Comments</h4>
+
+        <div class="comment card my-1" v-for="comment in comments">
+            <div class="card-body">
+                {{ comment.text }}
+            </div>
+            <div class="card-footer">
+                {{ comment.name }} on {{comment.timestamp}}
+            </div>
+        </div>
+
+        <div class="post-comment mt-4">
+            <h4>Post a comment</h4>
+            <form v-on:submit.prevent="postComment" v-if="newComment">
+                <div class="form-group row">
+                    <label for="comment-name" class="col-md-3 col-form-label">Your Name</label>
+                    <div class="col-md-9">
+                        <input type="text" id="comment-name" v-model="newComment.name" class="form-control" placeholder="Your name" />
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="comment-text" class="col-md-3 col-form-label">Comment</label>
+                    <div class="col-md-9">
+                        <textarea id="comment-text" v-model="newComment.text" class="form-control" rows="5"></textarea>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <partial name="_VueScript"></partial>
+    <script>
+        var app = new Vue({
+            el: '#comments',
+            data: {
+                postId: @Model.Id,
+                comments: [ ],
+                newComment: { }
+            },
+            created: function() {
+                this.refreshComments();
+            },
+            methods: {
+                refreshComments: function() { 
+                    var self = this;
+                    var xhr = new XMLHttpRequest();
+
+                    xhr.open('GET', '/api/posts/' +  this.postId + '/comments');
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+
+                    xhr.onload = function () {
+                        if (xhr.readyState === xhr.DONE && xhr.status === 200) {
+                            self.comments = JSON.parse(xhr.response);
+                        }
+                    };
+                    xhr.send();
+                },
+                postComment: function() {
+                    var self = this;
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('POST', '/api/posts/' +  this.postId + '/comments');
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+
+                    xhr.onload = function () {
+                        if (xhr.readyState === xhr.DONE && xhr.status === 201) {
+                            self.refreshComments();
+
+                            self.newComment.name = null;
+                            self.newComment.text = null;
+                        }
+                    };
+
+                    var data = {
+                        name: this.newComment.name,
+                        text: this.newComment.text
+                    };
+                    xhr.send(JSON.stringify(data));
+                }
+            }
+        })
+    </script>
+}
