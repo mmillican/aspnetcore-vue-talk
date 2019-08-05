@@ -1,7 +1,7 @@
 <template>
 <div>
     <h1>Admin</h1>
-    <nav></nav>
+    <admin-nav />
     
     <div class="app">
       <router-view></router-view>
@@ -14,7 +14,7 @@ import AdminNav from '@/components/AdminNav';
 
 export default {
   components: {
-    'nav': AdminNav
+    AdminNav
   }  
 }
 </script>
