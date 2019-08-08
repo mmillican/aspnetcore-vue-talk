@@ -43,7 +43,7 @@ namespace MvcWithVue.Controllers
                 
                 _commentService.Create(model);
 
-                return CreatedAtAction(nameof(GetById), new { id = model.Id }, model);
+                return CreatedAtAction(nameof(GetById), new { postId, id = model.Id }, model);
             }
             catch(Exception)
             {
