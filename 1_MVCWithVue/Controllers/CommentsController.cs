@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using MvcWithVue.Models;
 using MvcWithVue.Services;
@@ -7,14 +6,23 @@ using MvcWithVue.Services;
 namespace MvcWithVue.Controllers
 {
     [ApiController]
+    [ApiConventionType(typeof(DefaultApiConventions))]
     [Route("api/posts/{postId}/comments")]
     public class CommentsController : ControllerBase
-    {
+    {        
         private readonly ICommentService _commentService;
 
         public CommentsController(ICommentService commentService)
         {
             this._commentService = commentService;
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult GetById(int id)
+        {
+            var comment = _commentService.GetById(id);
+
+            return Ok(comment);
         }
 
         [HttpGet("")]
@@ -35,9 +43,7 @@ namespace MvcWithVue.Controllers
                 
                 _commentService.Create(model);
 
-                return Created("", model);
-
-                // return CreatedAtAction(nameof(GetByPost), new { id = model.Id }, model);
+                return CreatedAtAction(nameof(GetById), new { id = model.Id }, model);
             }
             catch(Exception)
             {
