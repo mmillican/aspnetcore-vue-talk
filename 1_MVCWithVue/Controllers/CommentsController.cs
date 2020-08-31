@@ -6,7 +6,6 @@ using MvcWithVue.Services;
 namespace MvcWithVue.Controllers
 {
     [ApiController]
-    [ApiConventionType(typeof(DefaultApiConventions))]
     [Route("api/posts/{postId}/comments")]
     public class CommentsController : ControllerBase
     {        
